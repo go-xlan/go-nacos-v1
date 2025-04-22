@@ -35,12 +35,12 @@ type NacosClient struct {
 	zapLog            *zaplog.Zap
 }
 
-func NewNacosClient(config *Config, zapLog *zaplog.Zap) (*NacosClient, error) {
+func NewNacosClient(config *Config, nacosOptions []constant.ClientOption, zapLog *zaplog.Zap) (*NacosClient, error) {
 	serviceIp := rese.C1(utils.GetIpv4())
 	port := utils.MustGetPortNum(config.Address)
 	portNum := rese.C1(strconv.Atoi(port))
 
-	nacosParam := MustNewNacosClientParam(config, zapLog, []constant.ClientOption{})
+	nacosParam := MustNewNacosClientParam(config, nacosOptions, zapLog)
 
 	nacosNamingClient, err := clients.NewNamingClient(nacosParam)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-xlan/go-nacos-v1/nacosv1"
+	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/yyle88/must"
 	"github.com/yyle88/rese"
 	"github.com/yyle88/zaplog"
@@ -18,7 +19,11 @@ func main() {
 		Group:     "DEFAULT_GROUP",
 		Namespace: "public",
 	}
-	client := rese.P1(nacosv1.NewNacosClient(config, zaplog.ZAP))
+	clientOptions := []constant.ClientOption{
+		constant.WithCacheDir("/tmp/nacos/cache"),
+		constant.WithLogDir("/tmp/nacos/log"),
+	}
+	client := rese.P1(nacosv1.NewNacosClient(config, clientOptions, zaplog.ZAP.NewZap("module", "demo1x")))
 	must.Done(client.RegisterService())
 	client.Online(context.Background())
 

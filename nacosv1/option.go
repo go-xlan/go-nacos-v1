@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func MustNewNacosClientParam(config *Config, zapLog *zaplog.Zap, nacosOptions []constant.ClientOption) vo.NacosClientParam {
+func MustNewNacosClientParam(config *Config, nacosOptions []constant.ClientOption, zapLog *zaplog.Zap) vo.NacosClientParam {
 	endpoint := config.Endpoint
 	if endpoint == "" {
 		endpoint = must.Nice(os.Getenv("NACOS_ADDR"))
