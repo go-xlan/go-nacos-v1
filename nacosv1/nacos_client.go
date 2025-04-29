@@ -36,8 +36,11 @@ type NacosClient struct {
 }
 
 func NewNacosClient(config *Config, nacosOptions []constant.ClientOption, zapLog *zaplog.Zap) (*NacosClient, error) {
-	serviceIp := rese.C1(utils.GetIpv4())
-	port := utils.MustGetPortNum(config.Address)
+	serviceIp := utils.MustGetIpV4(config.Address)
+	if serviceIp == "0.0.0.0" {
+		serviceIp = rese.C1(utils.GetIpv4())
+	}
+	port := utils.MustGetPort(config.Address)
 	portNum := rese.C1(strconv.Atoi(port))
 
 	nacosParam := MustNewNacosClientParam(config, nacosOptions, zapLog)

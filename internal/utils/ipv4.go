@@ -3,7 +3,7 @@ package utils
 import (
 	"net"
 
-	"github.com/pkg/errors"
+	"github.com/yyle88/erero"
 )
 
 func GetIpv4() (string, error) {
@@ -17,10 +17,13 @@ func GetIpv4() (string, error) {
 
 	interfaces, err := net.Interfaces()
 	if err != nil {
-		return "", err
+		return "", erero.Wro(err)
 	}
 
 	for _, item := range interfaces {
+		if item.Flags&net.FlagUp != net.FlagUp {
+			continue
+		}
 		addresses, err := item.Addrs()
 		if err != nil {
 			continue // Skip this interface
@@ -42,7 +45,7 @@ func GetIpv4() (string, error) {
 	}
 
 	if len(ips) == 0 {
-		return "", errors.New("没有从本地网卡找到ipv4")
+		return "", erero.New("没有从本地网卡找到ipv4")
 	}
 	return ips[0], nil
 }
