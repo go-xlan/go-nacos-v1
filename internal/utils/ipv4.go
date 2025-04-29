@@ -13,7 +13,6 @@ func GetIpv4() (string, error) {
 		"ens224": true,
 		"ens5":   true,
 	}
-	var ips []string
 
 	interfaces, err := net.Interfaces()
 	if err != nil {
@@ -24,28 +23,23 @@ func GetIpv4() (string, error) {
 		if item.Flags&net.FlagUp != net.FlagUp {
 			continue
 		}
+		if item.Flags&net.FlagLoopback == net.FlagLoopback {
+			continue
+		}
 		addresses, err := item.Addrs()
 		if err != nil {
-			continue // Skip this interface
+			continue // Skip this unknown interface
 		}
 
-		// Check if the current interface is the specified one
+		// Check if the current interface is the specified IP-address
 		if nets[item.Name] {
 			for _, address := range addresses {
-				switch ip := address.(type) {
-				case *net.IPNet:
-					if !ip.IP.IsLoopback() && ip.IP.To4() != nil {
-						ips = append(ips, ip.IP.String())
-					}
-				default:
-					continue // Ignore non-IP addresses
+				if ipNet, ok := address.(*net.IPNet); ok && ipNet.IP.To4() != nil && !ipNet.IP.IsLoopback() {
+					return ipNet.IP.String(), nil
 				}
 			}
 		}
 	}
 
-	if len(ips) == 0 {
-		return "", erero.New("没有从本地网卡找到ipv4")
-	}
-	return ips[0], nil
+	return "", erero.New("没有从本地网卡找到ipv4")
 }
